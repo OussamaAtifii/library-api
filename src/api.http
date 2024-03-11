@@ -1,0 +1,29 @@
+GET http://localhost:3001/api/books
+
+###
+GET http://localhost:3001/api/books/10
+
+###
+POST http://localhost:3001/api/books
+Content-Type: application/json
+
+{
+  "title": "The Girl with the Dragon Tattoo",
+  "author": "Stieg Larsson",
+  "publicationYear": 2005,
+  "genre": "Mystery thriller",
+  "isbn": "978-0-307-45475-0",
+  "publisher": "Knopf",
+  "pages": 672
+}
+
+###
+DELETE http://localhost:3001/api/books/19
+
+
+
+
+
+
+
+
