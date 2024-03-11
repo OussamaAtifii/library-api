@@ -8,3 +8,4 @@ booksRoute
   .get('/:bookId', BookController.getById)
   .post('/', BookController.create)
   .delete('/:bookId', BookController.delete)
+  .put('/:bookId', BookController.update)

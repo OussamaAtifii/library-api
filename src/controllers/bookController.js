@@ -1,4 +1,4 @@
-import { BookModel } from "../models/book.js"
+import { BookModel } from '../models/book.js'
 
 export class BookController {
   static async getAll (req, res) {
@@ -29,5 +29,16 @@ export class BookController {
 
     const bookDeleted = await BookModel.delete({ bookId })
     res.json(bookDeleted)
+  }
+
+  static async update (req, res) {
+    const { bookId } = req.params
+
+    // console.log(req.body);
+
+    const updated = await BookModel.update({ bookId, input: req.body })
+
+    if (!updated) return res.status(400).json({ message: 'Not updated' })
+    return res.json({ message: 'Updated succesfully' })
   }
 }

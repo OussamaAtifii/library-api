@@ -1,34 +1,33 @@
-import { createClient } from "@libsql/client"
-import dotenv from 'dotenv'
+import mongoose, { Schema } from 'mongoose'
 
-dotenv.config()
-
-const db = createClient({
-  url: process.env.DB_URL,
-  authToken: process.env.DB_TOKEN
+const bookSchema = new mongoose.Schema({
+  title: String,
+  publicationYear: Number,
+  genre: String,
+  isbn: String,
+  publisher: String,
+  pages: Number,
+  author: { type: Schema.Types.ObjectId, ref: 'Author' }
 })
+
+export const Book = mongoose.model('Book', bookSchema)
 
 export class BookModel {
   static async getAll () {
     try {
-      const { rows } = await db.execute('SELECT * FROM books')
-      return rows
+      const books = await Book.find({}).populate('author', '_id name')
+      return books
     } catch (error) {
-      console.log(error);
+      // TODO
     }
   }
 
   static async getById ({ bookId }) {
     try {
-      const { rows } = await db.execute({
-        sql: `SELECT * FROM books WHERE id = ?`,
-        args: [bookId]
-      })
-
-      return rows[0]
+      const book = await Book.findById(bookId).exec()
+      return book
     } catch (error) {
       // TODO
-      console.log(error);
     }
   }
 
@@ -44,40 +43,51 @@ export class BookModel {
     } = input
 
     try {
-      const { lastInsertRowid } = await db.execute({
-        sql: `INSERT INTO books(title, author, publicationYear, genre, isbn, publisher, pages)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        args: [title, author, publicationYear, genre, isbn, publisher, pages]
+      const createdBook = await Book.create({
+        title,
+        author,
+        publicationYear,
+        genre,
+        isbn,
+        publisher,
+        pages
       })
 
-      const { rows } = await db.execute({
-        sql: `SELECT * FROM books WHERE id = ?`,
-        args: [lastInsertRowid]
-      })
-
-      return rows[0]
+      return createdBook
     } catch (error) {
       // TODO
-      console.log(error);
+      console.log(error)
     }
   }
 
   static async delete ({ bookId }) {
-    const { rows } = await db.execute({
-      sql: `SELECT * FROM books WHERE id = ?`,
-      args: [bookId]
-    })
+    const bookDeleted = Book.deleteOne({ _id: bookId })
+    return bookDeleted
+  }
 
-    if (!rows) {
-      // TODO
+  static async update ({ bookId, input }) {
+    console.log(input)
+    console.log(bookId)
+
+    const {
+      title,
+      author,
+      publicationYear,
+      genre,
+      isbn,
+      publisher,
+      pages
+    } = input
+
+    if (!title || !author || !publicationYear || !genre || !isbn || !publisher || !pages) {
       return false
     }
 
-    await db.execute({
-      sql: `DELETE FROM books WHERE id = ?`,
-      args: [bookId]
-    })
+    try {
+      const updatedBook = Book.findByIdAndUpdate({ _id: bookId }, { $set: input }, { new: true }).exec()
+      return updatedBook
+    } catch (error) {
 
-    return rows[0]
+    }
   }
 }
