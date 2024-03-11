@@ -1,0 +1,37 @@
+GET http://localhost:3000/api/authors
+
+###
+GET http://localhost:3000/api/books/65ef5674fecbd7a446963333
+
+###
+POST http://localhost:3000/api/authors
+Content-Type: application/json
+
+{
+  "name": "Sigo probando"
+}
+
+###
+DELETE http://localhost:3000/api/authors/65ef8266fecbd7a446abe10f
+
+###
+PUT http://localhost:3000/api/authors/65ef5674fecbd7a446963325
+Content-Type: application/json
+
+ {
+  "id": 3,
+  "title": "The Lord of the Rings updated x4",
+  "author": "J.R.R. Tolkien",
+  "publicationYear": 1954,
+  "genre": "Epic fantasy",
+  "isbn": "978-84-450-7628-5",
+  "publisher": "Minotauro feo",
+  "pages": 1216,
+  "uwu" : "bromita"
+  }
+
+
+
+
+
+

@@ -1,0 +1,44 @@
+GET http://localhost:3000/api/books
+
+###
+GET http://localhost:3000/api/books/65ef5674fecbd7a446963333
+
+###
+POST http://localhost:3000/api/books
+Content-Type: application/json
+
+{
+  "title": "Oussama with the Dragon Tattoo",
+  "author": "Stieg Larsson",
+  "publicationYear": 2005,
+  "genre": "Mystery thriller",
+  "isbn": "978-0-307-45475-0",
+  "publisher": "Knopf",
+  "pages": 672,
+  "author": "65ef86f46b3306a3d1508f17"
+}
+
+###
+DELETE http://localhost:3000/api/books/65ef5674fecbd7a446963334
+
+###
+PUT http://localhost:3000/api/books/65ef5674fecbd7a446963325
+Content-Type: application/json
+
+ {
+  "id": 3,
+  "title": "The Lord of the Rings updated x4",
+  "author": "J.R.R. Tolkien",
+  "publicationYear": 1954,
+  "genre": "Epic fantasy",
+  "isbn": "978-84-450-7628-5",
+  "publisher": "Minotauro feo",
+  "pages": 1216,
+  "uwu" : "bromita"
+  }
+
+
+
+
+
+
