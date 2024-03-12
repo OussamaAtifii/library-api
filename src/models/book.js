@@ -18,16 +18,25 @@ export class BookModel {
       const books = await Book.find({}).populate('author', '_id name')
       return books
     } catch (error) {
-      // TODO
+      throw new Error('There was an issue retrieving the books. Please try again later')
     }
   }
 
   static async getById ({ bookId }) {
     try {
       const book = await Book.findById(bookId).exec()
+
+      if (!book) {
+        throw new Error(`No book found with id: ${bookId}`)
+      }
+
       return book
     } catch (error) {
-      // TODO
+      if (error.name === 'CastError') {
+        throw new Error('Error getting the book. Please make sure the ID is valid')
+      }
+
+      throw error
     }
   }
 

@@ -2,15 +2,29 @@ import { BookModel } from '../models/book.js'
 
 export class BookController {
   static async getAll (req, res) {
-    const books = await BookModel.getAll()
-    res.json(books)
+    try {
+      const books = await BookModel.getAll()
+      res.json(books)
+    } catch (error) {
+      res.status(500).json({ message: error.message })
+    }
   }
 
   static async getById (req, res) {
     const { bookId } = req.params
 
-    const book = await BookModel.getById({ bookId })
-    res.json(book)
+    if (!bookId) {
+      res.status(400).json({ message: 'Please add an ID' })
+    }
+
+    try {
+      const book = await BookModel.getById({ bookId })
+      console.log(book)
+      res.json(book)
+    } catch (error) {
+      // TODO 404 where the id is valid but there is not a book with the id
+      return res.status(400).json({ message: error.message })
+    }
   }
 
   static async create (req, res) {
