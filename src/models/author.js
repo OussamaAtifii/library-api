@@ -15,7 +15,8 @@ export class AuthorModel {
   }
 
   static async getById ({ authorId }) {
-    // TODO
+    const author = await Author.findById(authorId).exec()
+    return author
   }
 
   static async create ({ input }) {
