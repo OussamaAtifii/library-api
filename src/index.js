@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 
 import { booksRoute } from './routes/bookRoute.js'
 import { authorRouter } from './routes/authorRoute.js'
+import { userRouter } from './routes/userRouter.js'
 
 dotenv.config()
 
@@ -15,6 +16,7 @@ app.use(json())
 app.use(logger('dev'))
 app.use('/api/books', booksRoute)
 app.use('/api/authors', authorRouter)
+app.use('/api/users', userRouter)
 
 const PORT = process.env.PORT ?? 3000
 
