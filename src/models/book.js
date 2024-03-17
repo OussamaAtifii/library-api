@@ -1,10 +1,16 @@
 import mongoose, { Schema } from 'mongoose'
 
 const bookSchema = new mongoose.Schema({
-  title: String,
+  title: {
+    type: String,
+    unique: true
+  },
   publicationYear: Number,
   genre: String,
-  isbn: String,
+  isbn: {
+    type: String,
+    unique: true
+  },
   publisher: String,
   pages: Number,
   author: { type: Schema.Types.ObjectId, ref: 'Author' }
@@ -16,8 +22,7 @@ const bookSchema = new mongoose.Schema({
     }
   },
   versionKey: false
-}
-)
+})
 
 export const Book = mongoose.model('Book', bookSchema)
 
@@ -25,6 +30,7 @@ export class BookModel {
   static async getAll () {
     const books = await Book.find({})
       .populate('author', '_id name')
+
     return books
   }
 
@@ -44,22 +50,17 @@ export class BookModel {
       pages
     } = input
 
-    try {
-      const createdBook = await Book.create({
-        title,
-        author,
-        publicationYear,
-        genre,
-        isbn,
-        publisher,
-        pages
-      })
+    const createdBook = await Book.create({
+      title,
+      author,
+      publicationYear,
+      genre,
+      isbn,
+      publisher,
+      pages
+    })
 
-      return createdBook
-    } catch (error) {
-      // TODO
-      console.log(error)
-    }
+    return createdBook
   }
 
   static async delete ({ bookId }) {
@@ -68,14 +69,7 @@ export class BookModel {
   }
 
   static async update ({ bookId, input }) {
-    console.log(input)
-    console.log(bookId)
-
-    try {
-      const updatedBook = Book.findByIdAndUpdate({ _id: bookId }, { $set: input }, { new: true }).exec()
-      return updatedBook
-    } catch (error) {
-
-    }
+    const updatedBook = Book.findByIdAndUpdate({ _id: bookId }, { $set: input }, { new: true }).exec()
+    return updatedBook
   }
 }

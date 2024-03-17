@@ -1,4 +1,5 @@
 import { BookModel } from '../models/book.js'
+import { validateBook, validatePartialBook } from '../schemas/book.js'
 
 export class BookController {
   static async getAll (req, res) {
@@ -6,7 +7,7 @@ export class BookController {
       const books = await BookModel.getAll()
       res.json(books)
     } catch (error) {
-      res.status(500).json({ message: error.message })
+      res.status(500).json({ message: 'Error getting the books. Please try again later' })
     }
   }
 
@@ -14,45 +15,92 @@ export class BookController {
     const { bookId } = req.params
 
     if (!bookId) {
-      res.status(400).json({ message: 'Please add an ID' })
+      return res.status(400).json({ message: 'Please add an ID' })
     }
 
     try {
       const book = await BookModel.getById({ bookId })
-      console.log(book)
+
+      if (!book) {
+        return res.status(404).json({ message: `No book found with id: ${bookId}` })
+      }
+
       res.json(book)
     } catch (error) {
-      // TODO 404 where the id is valid but there is not a book with the id
-      return res.status(400).json({ message: error.message })
+      if (error.name === 'CastError') {
+        return res.status(400).json({ message: 'Error getting the book. Please make sure the ID is valid' })
+      }
+
+      return res.status(500).json({ message: 'Error getting the book. Please try again later' })
     }
   }
 
   static async create (req, res) {
-    const book = await BookModel.create({ input: req.body })
+    const isValid = validateBook(req.body)
 
-    res.json(book)
+    if (isValid.error) {
+      return res.status(400).json({ message: JSON.parse(isValid.error.message) })
+    }
+
+    try {
+      const book = await BookModel.create({ input: req.body })
+      return res.status(201).json(book)
+    } catch (error) {
+      return res.status(500).json({ message: 'Error creating the book. Please try again later' })
+    }
   }
 
   static async delete (req, res) {
     const { bookId } = req.params
 
     if (!bookId) {
-      // TODO
-      res.sendStatus(400)
+      return res.status(400).json({ message: 'Please add an ID' })
     }
 
-    const bookDeleted = await BookModel.delete({ bookId })
-    res.json(bookDeleted)
+    try {
+      const bookDeleted = await BookModel.delete({ bookId })
+
+      if (bookDeleted.deletedCount === 0) {
+        return res.status(404).json({ message: `No book found with id: ${bookId}` })
+      }
+
+      return res.json({ message: 'Book deleted successfully' })
+    } catch (error) {
+      if (error.name === 'CastError') {
+        return res.status(400).json({ message: 'Error deleting the book. Please make sure the ID is valid' })
+      }
+
+      return res.status(500).json({ message: 'Error deleting the book. Please try again later' })
+    }
   }
 
   static async update (req, res) {
     const { bookId } = req.params
 
-    // console.log(req.body);
+    if (!bookId || bookId.trim() === '') {
+      return res.status(400).json({ message: 'Please add an ID' })
+    }
 
-    const updated = await BookModel.update({ bookId, input: req.body })
+    const isValid = validatePartialBook(req.body)
 
-    if (!updated) return res.status(400).json({ message: 'Not updated' })
-    return res.json({ message: 'Updated succesfully' })
+    if (isValid.error) {
+      return res.status(400).json({ message: JSON.parse(isValid.error.message) })
+    }
+
+    try {
+      const updated = await BookModel.update({ bookId, input: req.body })
+
+      if (!updated) {
+        return res.status(404).json({ message: `No book found with id: ${bookId}` })
+      }
+
+      return res.json(updated)
+    } catch (error) {
+      if (error.name === 'CastError') {
+        return res.status(400).json({ message: 'Error updating the book. Please make sure the ID is valid' })
+      }
+
+      return res.status(500).json({ message: 'Error updating the book, Please try again later' })
+    }
   }
 }
