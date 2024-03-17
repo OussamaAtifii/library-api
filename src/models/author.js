@@ -4,7 +4,16 @@ import { Book } from './book.js'
 const authorSchema = new mongoose.Schema({
   name: String,
   books: [{ type: Schema.Types.ObjectId, ref: 'Book' }]
-})
+}, {
+  toJSON: {
+    transform: (doc, ret) => {
+      ret.id = ret._id
+      delete ret._id
+    }
+  },
+  versionKey: false
+}
+)
 
 const Author = mongoose.model('Author', authorSchema)
 

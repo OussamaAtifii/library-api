@@ -8,36 +8,29 @@ const bookSchema = new mongoose.Schema({
   publisher: String,
   pages: Number,
   author: { type: Schema.Types.ObjectId, ref: 'Author' }
-})
+}, {
+  toJSON: {
+    transform: (doc, ret) => {
+      ret.id = ret._id
+      delete ret._id
+    }
+  },
+  versionKey: false
+}
+)
 
 export const Book = mongoose.model('Book', bookSchema)
 
 export class BookModel {
   static async getAll () {
-    try {
-      const books = await Book.find({}).populate('author', '_id name')
-      return books
-    } catch (error) {
-      throw new Error('There was an issue retrieving the books. Please try again later')
-    }
+    const books = await Book.find({})
+      .populate('author', '_id name')
+    return books
   }
 
   static async getById ({ bookId }) {
-    try {
-      const book = await Book.findById(bookId).exec()
-
-      if (!book) {
-        throw new Error(`No book found with id: ${bookId}`)
-      }
-
-      return book
-    } catch (error) {
-      if (error.name === 'CastError') {
-        throw new Error('Error getting the book. Please make sure the ID is valid')
-      }
-
-      throw error
-    }
+    const book = await Book.findById(bookId).exec()
+    return book
   }
 
   static async create ({ input }) {
@@ -77,20 +70,6 @@ export class BookModel {
   static async update ({ bookId, input }) {
     console.log(input)
     console.log(bookId)
-
-    const {
-      title,
-      author,
-      publicationYear,
-      genre,
-      isbn,
-      publisher,
-      pages
-    } = input
-
-    if (!title || !author || !publicationYear || !genre || !isbn || !publisher || !pages) {
-      return false
-    }
 
     try {
       const updatedBook = Book.findByIdAndUpdate({ _id: bookId }, { $set: input }, { new: true }).exec()
